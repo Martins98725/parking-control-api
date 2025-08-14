@@ -13,6 +13,7 @@ import java.util.UUID;
 @Table(name = "TB_USER")
 public class UserModel implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
+    private final String roleId = "role_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,6 +24,19 @@ public class UserModel implements Serializable, UserDetails {
 
     @Column(unique = true, nullable = false)
     private String password;
+
+    @ManyToMany
+    @JoinTable(
+            name = "TB_USERS_ROLES",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = roleId)
+    )
+    private List<RoleModel> roles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities(){
+        return this.roles;
+    }
 
     public UserModel() {
     }
@@ -77,10 +91,5 @@ public class UserModel implements Serializable, UserDetails {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
     }
 }
